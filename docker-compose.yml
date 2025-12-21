@@ -30,6 +30,51 @@ services:
     volumes:
       - payments_db_data:/var/lib/postgresql/data
 
+  orders-service:
+    build:
+      context: .
+      dockerfile: OrdersService/Dockerfile
+    environment:
+      ASPNETCORE_URLS: "http://+:5042"
+      ASPNETCORE_ENVIRONMENT: "Docker"
+      ConnectionStrings__OrdersDb: "Host=orders-db;Port=5432;Database=ordersdb;Username=orders;Password=orders"
+      Rabbit__Host: "rabbitmq"
+      Rabbit__Port: "5672"
+      Rabbit__User: "guest"
+      Rabbit__Pass: "guest"
+    depends_on:
+      - orders-db
+      - rabbitmq
+
+  payments-service:
+    build:
+      context: .
+      dockerfile: PaymentsService/Dockerfile
+    environment:
+      ASPNETCORE_URLS: "http://+:5108"
+      ASPNETCORE_ENVIRONMENT: "Docker"
+      ConnectionStrings__PaymentsDb: "Host=payments-db;Port=5432;Database=paymentsdb;Username=payments;Password=payments"
+      Rabbit__Host: "rabbitmq"
+      Rabbit__Port: "5672"
+      Rabbit__User: "guest"
+      Rabbit__Pass: "guest"
+    depends_on:
+      - payments-db
+      - rabbitmq
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ApiGateway/Dockerfile
+    environment:
+      ASPNETCORE_URLS: "http://+:5271"
+      ASPNETCORE_ENVIRONMENT: "Docker"
+    ports:
+      - "5271:5271"
+    depends_on:
+      - orders-service
+      - payments-service
+
 volumes:
   orders_db_data:
   payments_db_data:

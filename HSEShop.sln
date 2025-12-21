@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrdersService", "OrdersServ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentsService", "PaymentsService\PaymentsService.csproj", "{7A4ED7E3-502E-43BB-B141-D4B52E926520}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{7B1C220D-DAB2-4BCB-8E3A-918594188488}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,18 @@ Global
 		{7A4ED7E3-502E-43BB-B141-D4B52E926520}.Release|x64.Build.0 = Release|Any CPU
 		{7A4ED7E3-502E-43BB-B141-D4B52E926520}.Release|x86.ActiveCfg = Release|Any CPU
 		{7A4ED7E3-502E-43BB-B141-D4B52E926520}.Release|x86.Build.0 = Release|Any CPU
+		{7B1C220D-DAB2-4BCB-8E3A-918594188488}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B1C220D-DAB2-4BCB-8E3A-918594188488}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B1C220D-DAB2-4BCB-8E3A-918594188488}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7B1C220D-DAB2-4BCB-8E3A-918594188488}.Debug|x64.Build.0 = Debug|Any CPU
+		{7B1C220D-DAB2-4BCB-8E3A-918594188488}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7B1C220D-DAB2-4BCB-8E3A-918594188488}.Debug|x86.Build.0 = Debug|Any CPU
+		{7B1C220D-DAB2-4BCB-8E3A-918594188488}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B1C220D-DAB2-4BCB-8E3A-918594188488}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B1C220D-DAB2-4BCB-8E3A-918594188488}.Release|x64.ActiveCfg = Release|Any CPU
+		{7B1C220D-DAB2-4BCB-8E3A-918594188488}.Release|x64.Build.0 = Release|Any CPU
+		{7B1C220D-DAB2-4BCB-8E3A-918594188488}.Release|x86.ActiveCfg = Release|Any CPU
+		{7B1C220D-DAB2-4BCB-8E3A-918594188488}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

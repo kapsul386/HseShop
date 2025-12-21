@@ -8,6 +8,10 @@ C:\Users\ddkup\RiderProjects\HSEShop\ApiGateway\bin\Debug\net9.0\ApiGateway.dll
 C:\Users\ddkup\RiderProjects\HSEShop\ApiGateway\bin\Debug\net9.0\ApiGateway.pdb
 C:\Users\ddkup\RiderProjects\HSEShop\ApiGateway\bin\Debug\net9.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\ddkup\RiderProjects\HSEShop\ApiGateway\bin\Debug\net9.0\Microsoft.OpenApi.dll
+C:\Users\ddkup\RiderProjects\HSEShop\ApiGateway\bin\Debug\net9.0\System.IO.Hashing.dll
+C:\Users\ddkup\RiderProjects\HSEShop\ApiGateway\bin\Debug\net9.0\Yarp.ReverseProxy.dll
+C:\Users\ddkup\RiderProjects\HSEShop\ApiGateway\bin\Debug\net9.0\Contracts.dll
+C:\Users\ddkup\RiderProjects\HSEShop\ApiGateway\bin\Debug\net9.0\Contracts.pdb
 C:\Users\ddkup\RiderProjects\HSEShop\ApiGateway\obj\Debug\net9.0\ApiGateway.csproj.AssemblyReference.cache
 C:\Users\ddkup\RiderProjects\HSEShop\ApiGateway\obj\Debug\net9.0\ApiGateway.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\ddkup\RiderProjects\HSEShop\ApiGateway\obj\Debug\net9.0\ApiGateway.AssemblyInfoInputs.cache
@@ -15,6 +19,7 @@ C:\Users\ddkup\RiderProjects\HSEShop\ApiGateway\obj\Debug\net9.0\ApiGateway.Asse
 C:\Users\ddkup\RiderProjects\HSEShop\ApiGateway\obj\Debug\net9.0\ApiGateway.csproj.CoreCompileInputs.cache
 C:\Users\ddkup\RiderProjects\HSEShop\ApiGateway\obj\Debug\net9.0\ApiGateway.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\ddkup\RiderProjects\HSEShop\ApiGateway\obj\Debug\net9.0\ApiGateway.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\ddkup\RiderProjects\HSEShop\ApiGateway\obj\Debug\net9.0\ApiGateway.sourcelink.json
 C:\Users\ddkup\RiderProjects\HSEShop\ApiGateway\obj\Debug\net9.0\scopedcss\bundle\ApiGateway.styles.css
 C:\Users\ddkup\RiderProjects\HSEShop\ApiGateway\obj\Debug\net9.0\staticwebassets.build.json
 C:\Users\ddkup\RiderProjects\HSEShop\ApiGateway\obj\Debug\net9.0\staticwebassets.development.json

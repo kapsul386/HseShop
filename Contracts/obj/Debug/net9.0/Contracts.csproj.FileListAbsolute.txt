@@ -1,0 +1,12 @@
+C:\Users\ddkup\RiderProjects\HSEShop\Contracts\bin\Debug\net9.0\Contracts.deps.json
+C:\Users\ddkup\RiderProjects\HSEShop\Contracts\bin\Debug\net9.0\Contracts.dll
+C:\Users\ddkup\RiderProjects\HSEShop\Contracts\bin\Debug\net9.0\Contracts.pdb
+C:\Users\ddkup\RiderProjects\HSEShop\Contracts\obj\Debug\net9.0\Contracts.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ddkup\RiderProjects\HSEShop\Contracts\obj\Debug\net9.0\Contracts.AssemblyInfoInputs.cache
+C:\Users\ddkup\RiderProjects\HSEShop\Contracts\obj\Debug\net9.0\Contracts.AssemblyInfo.cs
+C:\Users\ddkup\RiderProjects\HSEShop\Contracts\obj\Debug\net9.0\Contracts.csproj.CoreCompileInputs.cache
+C:\Users\ddkup\RiderProjects\HSEShop\Contracts\obj\Debug\net9.0\Contracts.sourcelink.json
+C:\Users\ddkup\RiderProjects\HSEShop\Contracts\obj\Debug\net9.0\Contracts.dll
+C:\Users\ddkup\RiderProjects\HSEShop\Contracts\obj\Debug\net9.0\refint\Contracts.dll
+C:\Users\ddkup\RiderProjects\HSEShop\Contracts\obj\Debug\net9.0\Contracts.pdb
+C:\Users\ddkup\RiderProjects\HSEShop\Contracts\obj\Debug\net9.0\ref\Contracts.dll

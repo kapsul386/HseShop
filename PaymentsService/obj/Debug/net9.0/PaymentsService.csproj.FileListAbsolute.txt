@@ -6,8 +6,17 @@ C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\bin\Debug\net9.0\PaymentsSe
 C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\bin\Debug\net9.0\PaymentsService.runtimeconfig.json
 C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\bin\Debug\net9.0\PaymentsService.dll
 C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\bin\Debug\net9.0\PaymentsService.pdb
-C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\bin\Debug\net9.0\Microsoft.AspNetCore.OpenApi.dll
+C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.dll
+C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.Relational.dll
 C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\bin\Debug\net9.0\Microsoft.OpenApi.dll
+C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\bin\Debug\net9.0\Npgsql.dll
+C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\bin\Debug\net9.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
+C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\bin\Debug\net9.0\Contracts.dll
+C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\bin\Debug\net9.0\Contracts.pdb
 C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\obj\Debug\net9.0\PaymentsService.csproj.AssemblyReference.cache
 C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\obj\Debug\net9.0\PaymentsService.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\obj\Debug\net9.0\PaymentsService.AssemblyInfoInputs.cache
@@ -15,6 +24,7 @@ C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\obj\Debug\net9.0\PaymentsSe
 C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\obj\Debug\net9.0\PaymentsService.csproj.CoreCompileInputs.cache
 C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\obj\Debug\net9.0\PaymentsService.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\obj\Debug\net9.0\PaymentsService.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\obj\Debug\net9.0\PaymentsService.sourcelink.json
 C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\obj\Debug\net9.0\scopedcss\bundle\PaymentsService.styles.css
 C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\obj\Debug\net9.0\staticwebassets.build.json
 C:\Users\ddkup\RiderProjects\HSEShop\PaymentsService\obj\Debug\net9.0\staticwebassets.development.json

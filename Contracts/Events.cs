@@ -1,7 +1,24 @@
 namespace Contracts;
 
-public record PaymentRequested(Guid OrderId, string UserId, decimal Amount, string Description);
+public static class Routing
+{
+    public const string Exchange = "hse.shop";
 
-public record PaymentSucceeded(Guid OrderId, string UserId);
+    public const string OrdersCreated = "orders.created";
+    public const string PaymentsSucceeded = "payments.succeeded";
+    public const string PaymentsFailed = "payments.failed";
+}
 
-public record PaymentFailed(Guid OrderId, string UserId, string Reason);
+public record MessageEnvelope(
+    Guid MessageId,
+    string Type,
+    DateTime OccurredAtUtc,
+    string PayloadJson,
+    Guid? CorrelationId = null
+);
+
+public record OrderCreatedV1(Guid OrderId, string UserId, decimal Amount);
+
+public record PaymentSucceededV1(Guid OrderId, string UserId, decimal Amount, Guid PaymentId);
+
+public record PaymentFailedV1(Guid OrderId, string UserId, decimal Amount, string Reason);

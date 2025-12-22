@@ -1,4 +1,4 @@
-namespace PaymentsService.Messaging;
+namespace OrdersService.Infrastructure.Messaging;
 
 public sealed class RabbitOptions
 {

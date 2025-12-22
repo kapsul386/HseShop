@@ -1,5 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using PaymentsService.Messaging;
+using PaymentsService.Application.Accounts;
+using PaymentsService.Infrastructure.Http;
+using PaymentsService.Infrastructure.Messaging;
+using PaymentsService.Infrastructure.Messaging.Consumers;
+using PaymentsService.Infrastructure.Messaging.Outbox;
 using PaymentsService.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,11 +12,23 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.Configure<RabbitOptions>(builder.Configuration.GetSection("Rabbit"));
+// HTTP user context
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUserContext, HttpUserContext>();
 
+// Application
+builder.Services.AddScoped<IAccountsService, AccountsService>();
+
+// DB
 builder.Services.AddDbContext<PaymentsDbContext>(o =>
     o.UseNpgsql(builder.Configuration.GetConnectionString("PaymentsDb")));
 
+// Rabbit
+builder.Services.Configure<RabbitOptions>(builder.Configuration.GetSection("Rabbit"));
+builder.Services.AddSingleton<IRabbitConnection, RabbitConnection>();
+
+// Messaging
+builder.Services.AddScoped<OrderPaymentProcessor>();
 builder.Services.AddHostedService<OrdersCreatedConsumer>();
 builder.Services.AddHostedService<PaymentsOutboxPublisher>();
 

@@ -26,33 +26,3 @@ public sealed class OrdersDbContext : DbContext
         base.OnModelCreating(modelBuilder);
     }
 }
-
-public enum OrderStatus
-{
-    NEW = 0,
-    FINISHED = 1,
-    CANCELLED = 2
-}
-
-public sealed class Order
-{
-    public Guid Id { get; set; }
-    public string UserId { get; set; } = default!;
-    public decimal Amount { get; set; }
-    public OrderStatus Status { get; set; }
-    public string? CancelReason { get; set; }
-    public DateTime CreatedAtUtc { get; set; }
-}
-
-public sealed class OutboxMessage
-{
-    public Guid Id { get; set; }
-    public string Type { get; set; } = default!;
-    public string RoutingKey { get; set; } = default!;
-    public string PayloadJson { get; set; } = default!;
-    public DateTime OccurredAtUtc { get; set; }
-
-    public DateTime? PublishedAtUtc { get; set; }
-    public int PublishAttempts { get; set; }
-    public string? LastError { get; set; }
-}

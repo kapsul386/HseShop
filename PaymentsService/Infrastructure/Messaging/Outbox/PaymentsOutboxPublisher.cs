@@ -1,40 +1,25 @@
 using System.Text;
 using Contracts;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using PaymentsService.Persistence;
 using RabbitMQ.Client;
 
-namespace PaymentsService.Messaging;
+namespace PaymentsService.Infrastructure.Messaging.Outbox;
 
 public sealed class PaymentsOutboxPublisher : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
-    private readonly RabbitOptions _opt;
+    private readonly IRabbitConnection _rabbit;
 
-    private IConnection? _conn;
-    private IModel? _ch;
-
-    public PaymentsOutboxPublisher(IServiceScopeFactory scopeFactory, IOptions<RabbitOptions> opt)
+    public PaymentsOutboxPublisher(IServiceScopeFactory scopeFactory, IRabbitConnection rabbit)
     {
         _scopeFactory = scopeFactory;
-        _opt = opt.Value;
+        _rabbit = rabbit;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var factory = new ConnectionFactory
-        {
-            HostName = _opt.Host,
-            Port = _opt.Port,
-            UserName = _opt.User,
-            Password = _opt.Pass
-        };
-
-        _conn = factory.CreateConnection();
-        _ch = _conn.CreateModel();
-
-        _ch.ExchangeDeclare(exchange: Routing.Exchange, type: ExchangeType.Topic, durable: true);
+        using var ch = _rabbit.CreateChannel();
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -61,13 +46,13 @@ public sealed class PaymentsOutboxPublisher : BackgroundService
                     {
                         var body = Encoding.UTF8.GetBytes(msg.PayloadJson);
 
-                        var props = _ch.CreateBasicProperties();
+                        var props = ch.CreateBasicProperties();
                         props.Persistent = true;
                         props.MessageId = msg.Id.ToString();
                         props.Type = msg.Type;
                         props.Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 
-                        _ch.BasicPublish(
+                        ch.BasicPublish(
                             exchange: Routing.Exchange,
                             routingKey: msg.RoutingKey,
                             basicProperties: props,
@@ -91,15 +76,5 @@ public sealed class PaymentsOutboxPublisher : BackgroundService
                 await Task.Delay(1000, stoppingToken);
             }
         }
-    }
-
-    public override void Dispose()
-    {
-        try { _ch?.Close(); } catch { }
-        try { _conn?.Close(); } catch { }
-
-        _ch?.Dispose();
-        _conn?.Dispose();
-        base.Dispose();
     }
 }

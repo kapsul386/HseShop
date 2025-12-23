@@ -7,6 +7,7 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    restart: unless-stopped
 
   orders-db:
     image: postgres:16
@@ -18,6 +19,7 @@ services:
       - "5433:5432"
     volumes:
       - orders_db_data:/var/lib/postgresql/data
+    restart: unless-stopped
 
   payments-db:
     image: postgres:16
@@ -29,6 +31,7 @@ services:
       - "5434:5432"
     volumes:
       - payments_db_data:/var/lib/postgresql/data
+    restart: unless-stopped
 
   orders-service:
     build:
@@ -45,6 +48,7 @@ services:
     depends_on:
       - orders-db
       - rabbitmq
+    restart: unless-stopped
 
   payments-service:
     build:
@@ -61,6 +65,7 @@ services:
     depends_on:
       - payments-db
       - rabbitmq
+    restart: unless-stopped
 
   api-gateway:
     build:
@@ -74,6 +79,35 @@ services:
     depends_on:
       - orders-service
       - payments-service
+    restart: unless-stopped
+
+  notifications-service:
+    build:
+      context: .
+      dockerfile: NotificationsService/Dockerfile
+    environment:
+      ASPNETCORE_URLS: "http://+:5280"
+      ASPNETCORE_ENVIRONMENT: "Docker"
+      Rabbit__Host: "rabbitmq"
+      Rabbit__Port: "5672"
+      Rabbit__User: "guest"
+      Rabbit__Pass: "guest"
+    ports:
+      - "5280:5280"
+    depends_on:
+      - rabbitmq
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - api-gateway
+      - notifications-service
+    restart: unless-stopped
 
 volumes:
   orders_db_data:

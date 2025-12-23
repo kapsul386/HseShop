@@ -34,7 +34,15 @@ builder.Services.AddHostedService<PaymentsOutboxPublisher>();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+// ✅ Apply migrations on startup (so Outbox/Inbox tables exist in docker volumes)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<PaymentsDbContext>();
+    db.Database.Migrate();
+}
+
+// ✅ Swagger in Docker too (ASPNETCORE_ENVIRONMENT=Docker)
+if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName.Equals("Docker", StringComparison.OrdinalIgnoreCase))
 {
     app.UseSwagger();
     app.UseSwaggerUI();
@@ -42,4 +50,5 @@ if (app.Environment.IsDevelopment())
 
 app.MapControllers();
 app.MapGet("/health", () => Results.Ok("OK"));
+
 app.Run();

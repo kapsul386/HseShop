@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HseShop Frontend</title>
+</head>
+<body>
+<div id="app">
+    <h1>HseShop</h1>
+
+    <section>
+        <h2>User</h2>
+        <label>
+            X-User-Id:
+            <input id="userId" value="u1" />
+        </label>
+        <button id="saveUser">Save</button>
+    </section>
+
+    <section>
+        <h2>Payments</h2>
+        <button id="createAccount">Create account</button>
+
+        <div>
+            <input id="topupAmount" type="number" value="100" />
+            <button id="topup">Top up</button>
+        </div>
+
+        <button id="balance">Get balance</button>
+        <pre id="balanceOut"></pre>
+    </section>
+
+    <section>
+        <h2>Orders</h2>
+        <input id="orderAmount" type="number" value="50" />
+        <button id="createOrder">Create order</button>
+
+        <button id="listOrders">List orders</button>
+        <pre id="ordersOut"></pre>
+
+        <div>
+            <b>Last orderId:</b> <span id="lastOrderId">-</span><br />
+            <b>WS status:</b> <span id="wsStatus">disconnected</span>
+        </div>
+        <pre id="wsOut"></pre>
+    </section>
+</div>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

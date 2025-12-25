@@ -1,0 +1,263 @@
+{
+	"info": {
+		"_postman_id": "0035dee6-ec2d-499d-8081-c760dfd2824f",
+		"name": "hse-shop (cleaned)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50680848",
+		"_collection_link": "https://kapsul386-5348503.postman.co/workspace/Dmitry-Kuptsov's-Workspace~af9b87ee-2937-4516-82a4-3a20b6075709/collection/50680848-0035dee6-ec2d-499d-8081-c760dfd2824f?action=share&source=collection_link&creator=50680848"
+	},
+	"item": [
+		{
+			"name": "01 Payments (sync)",
+			"item": [
+				{
+					"name": "Create account (idempotent)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-User-Id",
+								"value": "u1",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/payments/payments/account",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"payments",
+								"payments",
+								"account"
+							]
+						},
+						"description": "Создать счет пользователя (идемпотентно). Header X-User-Id обязателен."
+					},
+					"response": []
+				},
+				{
+					"name": "Top up balance",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-User-Id",
+								"value": "u1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"amount\": 100 }\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5271/payments/payments/topup",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5271",
+							"path": [
+								"payments",
+								"payments",
+								"topup"
+							]
+						},
+						"description": "Пополнить баланс пользователя."
+					},
+					"response": []
+				},
+				{
+					"name": "Get balance",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-Id",
+								"value": "{{userId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": ""
+						},
+						"description": "Посмотреть баланс пользователя."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "02 Orders (create is async)",
+			"item": [
+				{
+					"name": "Create order (amount=1500) — sets {{orderId}}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-User-Id",
+								"value": "u1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"amount\": 50 }\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5271/orders",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5271",
+							"path": [
+								"orders"
+							]
+						},
+						"description": "Создать заказ. Асинхронно запускает оплату (через RabbitMQ)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get order by id ({{orderId}})",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-Id",
+								"value": "{{userId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": ""
+						},
+						"description": "Получить статус заказа по id (использует коллекционную переменную orderId)."
+					},
+					"response": []
+				},
+				{
+					"name": "List orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-Id",
+								"value": "{{userId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5271/orders",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5271",
+							"path": [
+								"orders"
+							]
+						},
+						"description": "Список заказов пользователя."
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel order ({{orderId}})",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-User-Id",
+								"value": "{{userId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": ""
+						},
+						"description": "Отменить заказ по id (если сценарий поддерживается)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "99 Meta",
+			"item": [
+				{
+					"name": "Orders swagger.json",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						},
+						"description": "Проверка доступности swagger.json OrdersService через gateway."
+					},
+					"response": []
+				},
+				{
+					"name": "Payments swagger.json",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						},
+						"description": "Проверка доступности swagger.json PaymentsService через gateway."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5271",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "u1",
+			"type": "string"
+		},
+		{
+			"key": "orderId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "lastOrderId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

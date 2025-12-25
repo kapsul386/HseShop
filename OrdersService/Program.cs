@@ -34,7 +34,16 @@ builder.Services.AddHostedService<PaymentsEventsConsumer>();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+// Apply migrations before background services start working
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<OrdersDbContext>();
+    db.Database.Migrate();
+}
+
+// Swagger (Development + Docker)
+if (app.Environment.IsDevelopment() ||
+    app.Environment.EnvironmentName.Equals("Docker", StringComparison.OrdinalIgnoreCase))
 {
     app.UseSwagger();
     app.UseSwaggerUI();

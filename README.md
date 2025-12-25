@@ -1,9 +1,8 @@
 
-
-
 # HseShop
 
-Домашняя работа №4 по дисциплине **«Конструирование программного обеспечения»**
+Домашняя работа №4 по дисциплине **«Конструирование программного обеспечения»**  
+Тема: *Асинхронное межсервисное взаимодействие*
 
 ---
 
@@ -11,18 +10,20 @@
 
 **HseShop** — микросервисная система для обработки заказов и платежей с асинхронным взаимодействием между сервисами через брокер сообщений.
 
-Реализуемый сценарий:
+### Реализуемый бизнес-сценарий
 
 1. Пользователь создаёт аккаунт
 2. Пользователь пополняет баланс
 3. Пользователь создаёт заказ
-4. OrdersService публикует событие `orders.created` (Transactional Outbox)
-5. PaymentsService обрабатывает платёж (Inbox + exactly-once)
-6. PaymentsService публикует результат (`payments.succeeded` / `payments.failed`)
-7. OrdersService обновляет статус заказа (`FINISHED` / `CANCELLED`)
-8. Клиент получает push-уведомление о смене статуса через WebSocket
+4. **OrdersService** публикует событие `orders.created` (Transactional Outbox)
+5. **PaymentsService** обрабатывает платёж (Transactional Inbox + idempotency)
+6. **PaymentsService** публикует результат (`payments.succeeded` / `payments.failed`)
+7. **OrdersService** обновляет статус заказа:
+   - `FINISHED` — при успешной оплате
+   - `CANCELLED` — при недостатке средств
+8. Клиент получает push-уведомление о смене статуса через **WebSocket**
 
-Проект реализован в соответствии с требованиями задания, включая дополнительную часть.
+Проект полностью соответствует требованиям задания, включая дополнительные пункты на 10/10.
 
 ---
 
@@ -33,38 +34,38 @@
 - **ApiGateway**
   - YARP Reverse Proxy
   - единая точка входа
-  - проксирование запросов в backend-сервисы
+  - маршрутизация HTTP-запросов
 
 - **OrdersService**
   - создание заказов
   - хранение заказов
-  - публикация `orders.created` через Outbox
+  - Transactional Outbox (`orders.created`)
   - обработка результатов оплаты
 
 - **PaymentsService**
   - создание аккаунта пользователя
   - пополнение баланса
-  - обработка `orders.created`
+  - Transactional Inbox
   - exactly-once списание средств
-  - публикация `payments.succeeded` / `payments.failed` через Outbox
+  - Transactional Outbox (`payments.succeeded` / `payments.failed`)
 
 - **NotificationsService**
   - подписка на события оплаты
-  - WebSocket сервер
-  - отправка push-уведомлений клиентам о смене статуса заказа
+  - WebSocket-сервер
+  - push-уведомления клиентам о смене статуса заказа
 
 - **Frontend**
   - отдельный сервис
   - REST-взаимодействие с ApiGateway
   - WebSocket-подключение к NotificationsService
-  - отображение статусов заказов и push-уведомлений
+  - отображение заказов и уведомлений
 
 - **RabbitMQ**
   - брокер сообщений
   - topic exchange `hse.shop`
 
 - **PostgreSQL**
-  - отдельная база данных на сервис
+  - отдельная база данных на каждый сервис
 
 ---
 
@@ -82,10 +83,9 @@
 
 ---
 
+
 ## Структура репозитория
-
-```
-
+```text
 HseShop/
 ├── ApiGateway/
 │   ├── appsettings.json
@@ -129,17 +129,14 @@ HseShop/
 ├── HseShop.sln
 ├── hse-shop.postman_collection.json
 └── README.md
-
 ````
 
 ---
 
 ## Требования для запуска
 
-- Docker
-- Docker Compose
-
-Установка .NET SDK или Node.js локально **не требуется**, если запуск производится через Docker.
+* Docker
+* Docker Compose
 
 ---
 
@@ -150,9 +147,9 @@ HseShop/
 ```bash
 git clone https://github.com/kapsul386/HseShop.git
 cd HseShop
-````
+```
 
-### 2. Запуск всей системы
+### 2. Запуск системы
 
 ```bash
 docker compose up -d --build
@@ -174,16 +171,16 @@ docker compose ps
 | -------------------------------- | ------------------------------------------------------------ |
 | Frontend                         | [http://localhost:8080](http://localhost:8080)               |
 | ApiGateway                       | [http://localhost:5271](http://localhost:5271)               |
-| NotificationsService (WebSocket) | ws://localhost:5280                                          |
+| NotificationsService (WebSocket) | ws://localhost:5280/ws?orderId=<ORDER_ID>                    |
 | NotificationsService health      | [http://localhost:5280/health](http://localhost:5280/health) |
 | RabbitMQ UI                      | [http://localhost:15672](http://localhost:15672)             |
 | Orders DB                        | localhost:5433                                               |
 | Payments DB                      | localhost:5434                                               |
 
-RabbitMQ:
+RabbitMQ credentials:
 
-* логин: `guest`
-* пароль: `guest`
+* login: `guest`
+* password: `guest`
 
 ---
 
@@ -212,7 +209,7 @@ RabbitMQ:
 
 В репозитории находится готовая коллекция:
 
-```
+```text
 hse-shop.postman_collection.json
 ```
 
@@ -226,11 +223,9 @@ hse-shop.postman_collection.json
 
 1. **Create account (idempotent)**
    `POST {{baseUrl}}/payments/payments/account`
-   Header: `X-User-Id: {{userId}}`
 
 2. **Top up**
    `POST {{baseUrl}}/payments/payments/topup`
-   Body:
 
    ```json
    { "amount": 100 }
@@ -241,14 +236,16 @@ hse-shop.postman_collection.json
 
 4. **Create order**
    `POST {{baseUrl}}/orders`
-   Body:
 
    ```json
    { "amount": 50 }
    ```
 
-5. **Get order status**
-   Выполнить несколько раз с паузой 1–2 секунды
+5. **List orders**
+   `GET {{baseUrl}}/orders`
+
+6. **Get order status**
+   `GET {{baseUrl}}/orders/{{orderId}}`
    Ожидаемый статус: `FINISHED` или `CANCELLED`
 
 ---
@@ -256,25 +253,42 @@ hse-shop.postman_collection.json
 ### Через терминал
 
 ```bash
+# Create account
 curl -X POST http://localhost:5271/payments/payments/account \
   -H "X-User-Id: u1"
 
+# Top up
 curl -X POST http://localhost:5271/payments/payments/topup \
   -H "X-User-Id: u1" \
   -H "Content-Type: application/json" \
   -d "{\"amount\":100}"
 
+# Get balance
+curl http://localhost:5271/payments/payments/balance \
+  -H "X-User-Id: u1"
+
+# Create order
 curl -X POST http://localhost:5271/orders \
   -H "X-User-Id: u1" \
   -H "Content-Type: application/json" \
   -d "{\"amount\":50}"
-```
 
+# List orders
+curl http://localhost:5271/orders \
+  -H "X-User-Id: u1"
+
+# Get order status
+curl http://localhost:5271/orders/ORDER_ID \
+  -H "X-User-Id: u1"
+```
 
 ---
 
 ## Автор
+
 ```
-Купцов Дмитрий Дмитриевич 
+Купцов Дмитрий Дмитриевич
 БПИ-246
 ```
+
+

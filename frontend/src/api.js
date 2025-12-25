@@ -10,23 +10,52 @@ export function makeApi(userId) {
             },
         });
 
-        if (!res.ok) throw new Error(await res.text());
-        return res.json();
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(text || res.statusText);
+        }
+
+        // на случай 204 / пустых ответов
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            return res.json();
+        }
+
+        return null;
     }
 
     return {
-        createAccount: () => request("/payments/payments/account", { method: "POST" }),
+        /* ---------------- PAYMENTS ---------------- */
+
+        createAccount: () =>
+            request("/payments/payments/account", {
+                method: "POST",
+            }),
+
         topup: (amount) =>
             request("/payments/payments/topup", {
                 method: "POST",
                 body: JSON.stringify({ amount }),
             }),
-        balance: () => request("/payments/payments/balance"),
+
+        balance: () =>
+            request("/payments/payments/balance"),
+
+        /* ---------------- ORDERS ---------------- */
+
+        // POST /orders
         createOrder: (amount) =>
-            request("/orders/orders", {
+            request("/orders", {
                 method: "POST",
                 body: JSON.stringify({ amount }),
             }),
-        listOrders: () => request("/orders/orders"),
+
+        // GET /orders
+        listOrders: () =>
+            request("/orders"),
+
+        // GET /orders/{id}
+        getOrder: (orderId) =>
+            request(`/orders/${orderId}`),
     };
 }

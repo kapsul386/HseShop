@@ -1,5 +1,9 @@
 namespace OrdersService.Persistence;
 
+/// <summary>
+/// Сообщение transactional outbox.
+/// Используется для гарантированной публикации событий в брокер сообщений.
+/// </summary>
 public sealed class OutboxMessage
 {
     public Guid Id { get; set; }

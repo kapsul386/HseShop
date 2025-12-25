@@ -5,6 +5,9 @@ using PaymentsService.Persistence;
 
 namespace PaymentsService.Application.Accounts;
 
+/// <summary>
+/// Бизнес-логика работы со счетами пользователей.
+/// </summary>
 public sealed class AccountsService : IAccountsService
 {
     private readonly PaymentsDbContext _db;
@@ -16,6 +19,9 @@ public sealed class AccountsService : IAccountsService
         _user = user;
     }
 
+    /// <summary>
+    /// Идемпотентно создаёт счёт пользователя (не более одного счёта на userId).
+    /// </summary>
     public async Task<AccountView> CreateAccountAsync(CancellationToken ct)
     {
         var userId = _user.UserId;
@@ -37,6 +43,9 @@ public sealed class AccountsService : IAccountsService
         return new AccountView(acc.UserId, acc.Balance);
     }
 
+    /// <summary>
+    /// Пополняет баланс пользователя.
+    /// </summary>
     public async Task<AccountView> TopUpAsync(TopUpRequest req, CancellationToken ct)
     {
         if (req.Amount <= 0)
@@ -55,6 +64,9 @@ public sealed class AccountsService : IAccountsService
         return new AccountView(acc.UserId, acc.Balance);
     }
 
+    /// <summary>
+    /// Возвращает баланс пользователя или null, если счёт ещё не создан.
+    /// </summary>
     public async Task<AccountView?> GetBalanceAsync(CancellationToken ct)
     {
         var userId = _user.UserId;

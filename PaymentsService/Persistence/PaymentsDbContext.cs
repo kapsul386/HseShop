@@ -2,9 +2,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace PaymentsService.Persistence;
 
+/// <summary>
+/// Контекст базы данных PaymentsService.
+/// Содержит данные счетов, оплат и таблицы inbox/outbox.
+/// </summary>
 public sealed class PaymentsDbContext : DbContext
 {
-    public PaymentsDbContext(DbContextOptions<PaymentsDbContext> options) : base(options) { }
+    public PaymentsDbContext(DbContextOptions<PaymentsDbContext> options)
+        : base(options) { }
 
     public DbSet<Account> Accounts => Set<Account>();
     public DbSet<Payment> Payments => Set<Payment>();

@@ -1,5 +1,8 @@
 namespace OrdersService.Infrastructure.Messaging;
 
+/// <summary>
+/// Параметры подключения к RabbitMQ.
+/// </summary>
 public sealed class RabbitOptions
 {
     public string Host { get; set; } = "localhost";

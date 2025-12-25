@@ -1,12 +1,12 @@
 import { makeApi } from "./api.js";
 import { connectWs } from "./ws.js";
 
+
 let userId = localStorage.getItem("userId") || "u1";
 let api = makeApi(userId);
 
 const $ = (id) => document.getElementById(id);
 
-// --- toast helper (без библиотек) ---
 function ensureToastHost() {
     let host = document.getElementById("toastHost");
     if (!host) {
@@ -34,10 +34,8 @@ function toast(text) {
     el.style.boxShadow = "0 6px 20px rgba(0,0,0,.15)";
     el.style.background = "white";
     el.style.border = "1px solid rgba(0,0,0,.08)";
-    el.style.fontFamily = "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial";
+    el.style.fontFamily = "system-ui, sans-serif";
     el.style.fontSize = "14px";
-    el.style.maxWidth = "320px";
-    el.style.wordBreak = "break-word";
 
     host.appendChild(el);
 
@@ -48,6 +46,7 @@ function toast(text) {
     }, 2500);
 }
 
+// helper для аккуратного выполнения async-операций
 async function safeRun(fn, outElId) {
     try {
         const r = await fn();
@@ -60,6 +59,8 @@ async function safeRun(fn, outElId) {
         throw e;
     }
 }
+
+/* ---------- UI handlers ---------- */
 
 $("userId").value = userId;
 
@@ -93,13 +94,14 @@ function setWsStatus(st) {
     $("wsStatus").textContent = st;
 }
 
+// Создание заказа + подключение к WebSocket
 $("createOrder").onclick = async () => {
     const amount = Number($("orderAmount").value);
 
     $("wsOut").textContent = "";
     setWsStatus("connecting");
 
-    // закрываем прошлый WS, если был
+    // закрываем прошлое WS-соединение
     if (disconnectWs) {
         disconnectWs();
         disconnectWs = null;
@@ -108,29 +110,26 @@ $("createOrder").onclick = async () => {
     let r;
     try {
         r = await api.createOrder(amount);
-    } catch (e) {
+    } catch {
         setWsStatus("error");
         return;
     }
 
     const orderId = r.orderId || r.id || r.orderID;
     if (!orderId) {
-        toast("createOrder: cannot find orderId in response");
+        toast("Cannot find orderId in response");
         setWsStatus("error");
         return;
     }
 
     $("lastOrderId").textContent = orderId;
 
+    // подключаемся к WS для push-уведомлений
     disconnectWs = connectWs(
         orderId,
         (msg) => {
             $("wsOut").textContent += JSON.stringify(msg) + "\n";
-
-            // нормальное уведомление вместо alert
-            const sid = msg.orderId ?? orderId;
-            const st = msg.status ?? msg.state ?? "UNKNOWN";
-            toast(`Order ${sid}: ${st}`);
+            toast(`Order ${msg.orderId}: ${msg.status}`);
         },
         (st) => setWsStatus(st)
     );

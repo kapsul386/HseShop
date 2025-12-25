@@ -5,18 +5,23 @@ using System.Text.Json;
 
 namespace NotificationsService.Ws;
 
+/// <summary>
+/// WebSocket-хаб для push-уведомлений по заказам.
+/// </summary>
 public sealed class WsHub
 {
-    // orderId -> connections (connId -> socket)
+    // orderId -> (connectionId -> socket)
     private readonly ConcurrentDictionary<Guid, ConcurrentDictionary<Guid, WebSocket>> _map = new();
 
+    /// <summary>
+    /// Обрабатывает входящее WebSocket-соединение для конкретного заказа.
+    /// </summary>
     public async Task HandleConnectionAsync(Guid orderId, WebSocket socket, CancellationToken ct)
     {
         var connId = Guid.NewGuid();
         var group = _map.GetOrAdd(orderId, _ => new ConcurrentDictionary<Guid, WebSocket>());
         group[connId] = socket;
 
-        // Держим соединение открытым (читаем "пустые" сообщения)
         var buf = new byte[1024];
         try
         {
@@ -39,18 +44,15 @@ public sealed class WsHub
         }
     }
 
+    /// <summary>
+    /// Отправляет уведомление всем подключённым клиентам по orderId.
+    /// </summary>
     public async Task NotifyAsync(Guid orderId, string status, string? reason, CancellationToken ct)
     {
         if (!_map.TryGetValue(orderId, out var group) || group.IsEmpty)
             return;
 
-        var payload = JsonSerializer.Serialize(new
-        {
-            orderId,
-            status,
-            reason
-        });
-
+        var payload = JsonSerializer.Serialize(new { orderId, status, reason });
         var bytes = Encoding.UTF8.GetBytes(payload);
         var seg = new ArraySegment<byte>(bytes);
 
@@ -66,7 +68,7 @@ public sealed class WsHub
 
             try
             {
-                await socket.SendAsync(seg, WebSocketMessageType.Text, endOfMessage: true, cancellationToken: ct);
+                await socket.SendAsync(seg, WebSocketMessageType.Text, true, ct);
             }
             catch
             {

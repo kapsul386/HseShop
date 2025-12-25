@@ -1,5 +1,9 @@
 namespace PaymentsService.Persistence;
 
+/// <summary>
+/// Сообщение transactional outbox.
+/// Гарантирует публикацию событий в RabbitMQ.
+/// </summary>
 public sealed class OutboxMessage
 {
     public Guid Id { get; set; }

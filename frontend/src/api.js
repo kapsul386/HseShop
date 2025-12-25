@@ -1,6 +1,9 @@
+// Клиент для работы с backend через ApiGateway.
+// Все запросы идут с X-User-Id.
 export function makeApi(userId) {
     const base = "/api";
 
+    // Базовый helper для fetch
     async function request(path, options = {}) {
         const res = await fetch(base + path, {
             ...options,
@@ -15,7 +18,7 @@ export function makeApi(userId) {
             throw new Error(text || res.statusText);
         }
 
-        // на случай 204 / пустых ответов
+        // поддержка 204 / пустых ответов
         const contentType = res.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
             return res.json();
@@ -25,36 +28,39 @@ export function makeApi(userId) {
     }
 
     return {
-        /* ---------------- PAYMENTS ---------------- */
+        /* -------- PAYMENTS -------- */
 
+        // Идемпотентное создание аккаунта
         createAccount: () =>
             request("/payments/payments/account", {
                 method: "POST",
             }),
 
+        // Пополнение баланса
         topup: (amount) =>
             request("/payments/payments/topup", {
                 method: "POST",
                 body: JSON.stringify({ amount }),
             }),
 
+        // Текущий баланс
         balance: () =>
             request("/payments/payments/balance"),
 
-        /* ---------------- ORDERS ---------------- */
+        /* -------- ORDERS -------- */
 
-        // POST /orders
+        // Создание заказа (POST /orders)
         createOrder: (amount) =>
             request("/orders", {
                 method: "POST",
                 body: JSON.stringify({ amount }),
             }),
 
-        // GET /orders
+        // Список заказов пользователя
         listOrders: () =>
             request("/orders"),
 
-        // GET /orders/{id}
+        // Получение заказа по id
         getOrder: (orderId) =>
             request(`/orders/${orderId}`),
     };

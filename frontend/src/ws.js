@@ -1,3 +1,4 @@
+// WebSocket-клиент для получения push-уведомлений по заказу
 export function connectWs(orderId, onMessage, onStatus) {
     let ws = null;
     let closedByClient = false;
@@ -7,30 +8,25 @@ export function connectWs(orderId, onMessage, onStatus) {
     const url = `ws://localhost:5280/ws?orderId=${encodeURIComponent(orderId)}`;
 
     function safeStatus(s) {
-        try { onStatus?.(s); } catch { /* ignore */ }
+        try { onStatus?.(s); } catch {}
     }
 
     function safeMessage(msg) {
-        try { onMessage?.(msg); } catch { /* ignore */ }
+        try { onMessage?.(msg); } catch {}
     }
 
     function stopTimers() {
-        if (reconnectTimer) {
-            clearTimeout(reconnectTimer);
-            reconnectTimer = null;
-        }
-        if (pingTimer) {
-            clearInterval(pingTimer);
-            pingTimer = null;
-        }
+        if (reconnectTimer) clearTimeout(reconnectTimer);
+        if (pingTimer) clearInterval(pingTimer);
+        reconnectTimer = null;
+        pingTimer = null;
     }
 
+    // Периодический ping, чтобы соединение не закрывалось прокси
     function startPing() {
-        // Пингуем раз в 25s: помогает держать соединение живым
-        // На сервере можно игнорировать "ping" или отвечать "pong" — это не ломает.
         pingTimer = setInterval(() => {
             if (ws && ws.readyState === WebSocket.OPEN) {
-                try { ws.send("ping"); } catch { /* ignore */ }
+                try { ws.send("ping"); } catch {}
             }
         }, 25000);
     }
@@ -39,9 +35,7 @@ export function connectWs(orderId, onMessage, onStatus) {
         if (closedByClient) return;
         stopTimers();
         safeStatus("reconnecting");
-        reconnectTimer = setTimeout(() => {
-            open();
-        }, 1000);
+        reconnectTimer = setTimeout(open, 1000);
     }
 
     function open() {
@@ -63,21 +57,20 @@ export function connectWs(orderId, onMessage, onStatus) {
 
         ws.onerror = () => {
             safeStatus("error");
-            // onclose обычно тоже сработает, но если нет — переподключим
             scheduleReconnect();
         };
 
         ws.onmessage = (e) => {
             const data = e.data;
 
-            // сервер может присылать "pong" или любые текстовые сервисные сообщения
+            // сервисные сообщения можно игнорировать
             if (typeof data === "string") {
-                if (data === "pong" || data === "ping") return;
+                if (data === "ping" || data === "pong") return;
 
                 try {
                     safeMessage(JSON.parse(data));
                 } catch {
-                    // не JSON — просто игнорим, чтобы фронт не падал
+                    // не JSON — игнорируем
                 }
             }
         };
@@ -85,11 +78,11 @@ export function connectWs(orderId, onMessage, onStatus) {
 
     open();
 
-    // cleanup
+    // cleanup-функция
     return () => {
         closedByClient = true;
         stopTimers();
-        try { ws?.close(); } catch { /* ignore */ }
+        try { ws?.close(); } catch {}
         ws = null;
     };
 }

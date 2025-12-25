@@ -7,6 +7,10 @@ using RabbitMQ.Client.Events;
 
 namespace NotificationsService.Messaging;
 
+/// <summary>
+/// Consumer событий оплаты.
+/// Преобразует события из RabbitMQ в push-уведомления по WebSocket.
+/// </summary>
 public sealed class PaymentsEventsConsumer : BackgroundService
 {
     private readonly IRabbitConnection _rabbit;
@@ -43,14 +47,16 @@ public sealed class PaymentsEventsConsumer : BackgroundService
 
                 if (ea.RoutingKey == Routing.PaymentsSucceeded)
                 {
-                    var evt = JsonSerializer.Deserialize<PaymentSucceededV1>(json);
-                    if (evt is null) throw new InvalidOperationException("Bad PaymentSucceededV1");
+                    var evt = JsonSerializer.Deserialize<PaymentSucceededV1>(json)
+                        ?? throw new InvalidOperationException("Bad PaymentSucceededV1");
+
                     await _hub.NotifyAsync(evt.OrderId, "FINISHED", null, stoppingToken);
                 }
                 else if (ea.RoutingKey == Routing.PaymentsFailed)
                 {
-                    var evt = JsonSerializer.Deserialize<PaymentFailedV1>(json);
-                    if (evt is null) throw new InvalidOperationException("Bad PaymentFailedV1");
+                    var evt = JsonSerializer.Deserialize<PaymentFailedV1>(json)
+                        ?? throw new InvalidOperationException("Bad PaymentFailedV1");
+
                     await _hub.NotifyAsync(evt.OrderId, "CANCELLED", evt.Reason, stoppingToken);
                 }
 

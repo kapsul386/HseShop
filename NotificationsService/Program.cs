@@ -4,7 +4,6 @@ using NotificationsService.Ws;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Docker config override
 builder.Configuration.AddJsonFile("appsettings.Docker.json", optional: true, reloadOnChange: true);
 
 builder.Services.Configure<RabbitOptions>(builder.Configuration.GetSection("Rabbit"));

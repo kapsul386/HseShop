@@ -4,6 +4,9 @@ using RabbitMQ.Client;
 
 namespace NotificationsService.Messaging;
 
+/// <summary>
+/// Реализация подключения к RabbitMQ с объявлением exchange.
+/// </summary>
 public sealed class RabbitConnection : IRabbitConnection
 {
     private readonly IConnection _conn;
@@ -27,13 +30,16 @@ public sealed class RabbitConnection : IRabbitConnection
     public IModel CreateChannel()
     {
         var ch = _conn.CreateModel();
-        ch.ExchangeDeclare(exchange: Routing.Exchange, type: ExchangeType.Topic, durable: true);
+        ch.ExchangeDeclare(
+            exchange: Routing.Exchange,
+            type: ExchangeType.Topic,
+            durable: true);
         return ch;
     }
 
     public void Dispose()
     {
-        try { _conn.Close(); } catch { }
+        try { _conn.Close(); } catch { /* ignore */ }
         _conn.Dispose();
     }
 }

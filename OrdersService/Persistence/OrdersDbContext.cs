@@ -2,6 +2,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace OrdersService.Persistence;
 
+/// <summary>
+/// Контекст базы данных OrdersService.
+/// </summary>
 public sealed class OrdersDbContext : DbContext
 {
     public OrdersDbContext(DbContextOptions<OrdersDbContext> options) : base(options) { }

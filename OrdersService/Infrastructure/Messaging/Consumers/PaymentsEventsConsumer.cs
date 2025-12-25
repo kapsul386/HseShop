@@ -6,6 +6,9 @@ using RabbitMQ.Client.Events;
 
 namespace OrdersService.Infrastructure.Messaging.Consumers;
 
+/// <summary>
+/// Фоновый consumer, обрабатывающий результаты оплаты заказов.
+/// </summary>
 public sealed class PaymentsEventsConsumer : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
@@ -43,15 +46,15 @@ public sealed class PaymentsEventsConsumer : BackgroundService
 
                 if (ea.RoutingKey == Routing.PaymentsSucceeded)
                 {
-                    var evt = JsonSerializer.Deserialize<PaymentSucceededV1>(json);
-                    if (evt is null) throw new InvalidOperationException("Invalid PaymentSucceededV1 payload.");
+                    var evt = JsonSerializer.Deserialize<PaymentSucceededV1>(json)
+                        ?? throw new InvalidOperationException("Invalid PaymentSucceededV1 payload.");
 
                     await handler.ApplySucceededAsync(evt.OrderId, stoppingToken);
                 }
                 else if (ea.RoutingKey == Routing.PaymentsFailed)
                 {
-                    var evt = JsonSerializer.Deserialize<PaymentFailedV1>(json);
-                    if (evt is null) throw new InvalidOperationException("Invalid PaymentFailedV1 payload.");
+                    var evt = JsonSerializer.Deserialize<PaymentFailedV1>(json)
+                        ?? throw new InvalidOperationException("Invalid PaymentFailedV1 payload.");
 
                     await handler.ApplyFailedAsync(evt.OrderId, evt.Reason, stoppingToken);
                 }
@@ -66,7 +69,6 @@ public sealed class PaymentsEventsConsumer : BackgroundService
 
         ch.BasicConsume(queue: q.QueueName, autoAck: false, consumer: consumer);
 
-        // держим сервис живым, пока не отменят
         return Task.Delay(Timeout.Infinite, stoppingToken);
     }
 }

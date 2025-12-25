@@ -4,6 +4,10 @@ using OrdersService.Application.Orders.Dtos;
 
 namespace OrdersService.Controllers;
 
+/// <summary>
+/// HTTP API для работы с заказами.
+/// Используется через ApiGateway (префикс /orders).
+/// </summary>
 [ApiController]
 [Route("")]
 public sealed class OrdersController : ControllerBase
@@ -12,19 +16,27 @@ public sealed class OrdersController : ControllerBase
 
     public OrdersController(IOrdersService orders) => _orders = orders;
 
-    // Создание заказа: принимает и POST /, и POST /orders
+    /// <summary>
+    /// Создаёт новый заказ и асинхронно инициирует процесс оплаты.
+    /// </summary>
     [HttpPost]
     [HttpPost("orders")]
-    public async Task<ActionResult<CreateOrderResponse>> Create([FromBody] CreateOrderRequest req, CancellationToken ct)
+    public async Task<ActionResult<CreateOrderResponse>> Create(
+        [FromBody] CreateOrderRequest req,
+        CancellationToken ct)
         => Ok(await _orders.CreateAsync(req, ct));
 
-    // Список заказов: GET / и GET /orders
+    /// <summary>
+    /// Возвращает список заказов текущего пользователя.
+    /// </summary>
     [HttpGet]
     [HttpGet("orders")]
     public async Task<ActionResult<List<OrderView>>> List(CancellationToken ct)
         => Ok(await _orders.ListAsync(ct));
 
-    // Статус заказа: GET /{id} и GET /orders/{id}
+    /// <summary>
+    /// Возвращает информацию о заказе по идентификатору.
+    /// </summary>
     [HttpGet("{id:guid}")]
     [HttpGet("orders/{id:guid}")]
     public async Task<ActionResult<OrderView>> Get(Guid id, CancellationToken ct)

@@ -5,17 +5,24 @@ using PaymentsService.Persistence;
 
 namespace PaymentsService.Infrastructure.Messaging.Consumers;
 
+/// <summary>
+/// Обрабатывает событие OrderCreated и выполняет списание средств.
+/// Реализует семантику exactly-once с использованием Inbox + Outbox.
+/// </summary>
 public sealed class OrderPaymentProcessor
 {
     private readonly PaymentsDbContext _db;
 
     public OrderPaymentProcessor(PaymentsDbContext db) => _db = db;
 
+    /// <summary>
+    /// Обрабатывает событие создания заказа с защитой от повторной обработки.
+    /// </summary>
     public async Task ProcessAsync(Guid messageId, OrderCreatedV1 evt, string rawJson, CancellationToken ct)
     {
         await using var tx = await _db.Database.BeginTransactionAsync(ct);
 
-        // 1) Inbox дедуп
+        // 1) Inbox-дедупликация
         var inbox = await _db.Inbox.FirstOrDefaultAsync(x => x.MessageId == messageId, ct);
         if (inbox is not null && inbox.ProcessedAtUtc is not null)
         {
@@ -39,7 +46,7 @@ public sealed class OrderPaymentProcessor
 
         inbox.ProcessAttempts += 1;
 
-        // 2) Счет существует?
+        // 2) Проверка существования счёта
         var acc = await _db.Accounts.FirstOrDefaultAsync(x => x.UserId == evt.UserId, ct);
         if (acc is null)
         {
@@ -51,7 +58,7 @@ public sealed class OrderPaymentProcessor
             return;
         }
 
-        // 3) Атомарное списание (если хватает денег)
+        // 3) Атомарное списание средств
         var updated = await _db.Database.ExecuteSqlInterpolatedAsync($@"
             UPDATE ""Accounts""
             SET ""Balance"" = ""Balance"" - {evt.Amount}, ""UpdatedAtUtc"" = {DateTime.UtcNow}
@@ -68,7 +75,7 @@ public sealed class OrderPaymentProcessor
             return;
         }
 
-        // 4) Создаём Payment (уникальный индекс OrderId защищает от повторного списания)
+        // 4) Создание Payment (уникальность OrderId защищает от повторного списания)
         try
         {
             var payment = new Payment
@@ -86,8 +93,7 @@ public sealed class OrderPaymentProcessor
         }
         catch (DbUpdateException)
         {
-            // Повторное сообщение после успешной обработки: OrderId уникален — считаем идемпотентным успехом.
-            // Outbox повторно не пишем.
+            // Повторное сообщение после успешной обработки — считаем идемпотентным успехом.
         }
 
         inbox.ProcessedAtUtc = DateTime.UtcNow;
@@ -99,7 +105,9 @@ public sealed class OrderPaymentProcessor
 
     private async Task WriteOutboxSuccessAsync(OrderCreatedV1 evt, Guid paymentId, CancellationToken ct)
     {
-        var payload = JsonSerializer.Serialize(new PaymentSucceededV1(evt.OrderId, evt.UserId, evt.Amount, paymentId));
+        var payload = JsonSerializer.Serialize(
+            new PaymentSucceededV1(evt.OrderId, evt.UserId, evt.Amount, paymentId));
+
         _db.Outbox.Add(new OutboxMessage
         {
             Id = Guid.NewGuid(),
@@ -108,12 +116,15 @@ public sealed class OrderPaymentProcessor
             PayloadJson = payload,
             OccurredAtUtc = DateTime.UtcNow
         });
+
         await _db.SaveChangesAsync(ct);
     }
 
     private async Task WriteOutboxFailAsync(OrderCreatedV1 evt, string reason, CancellationToken ct)
     {
-        var payload = JsonSerializer.Serialize(new PaymentFailedV1(evt.OrderId, evt.UserId, evt.Amount, reason));
+        var payload = JsonSerializer.Serialize(
+            new PaymentFailedV1(evt.OrderId, evt.UserId, evt.Amount, reason));
+
         _db.Outbox.Add(new OutboxMessage
         {
             Id = Guid.NewGuid(),
@@ -122,6 +133,7 @@ public sealed class OrderPaymentProcessor
             PayloadJson = payload,
             OccurredAtUtc = DateTime.UtcNow
         });
+
         await _db.SaveChangesAsync(ct);
     }
 }

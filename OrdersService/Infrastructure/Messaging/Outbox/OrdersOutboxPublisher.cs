@@ -6,6 +6,9 @@ using RabbitMQ.Client;
 
 namespace OrdersService.Infrastructure.Messaging.Outbox;
 
+/// <summary>
+/// Фоновый publisher, отправляющий события из Outbox в RabbitMQ.
+/// </summary>
 public sealed class OrdersOutboxPublisher : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
@@ -50,7 +53,6 @@ public sealed class OrdersOutboxPublisher : BackgroundService
                         props.Persistent = true;
                         props.MessageId = msg.Id.ToString();
                         props.Type = msg.Type;
-                        props.Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 
                         ch.BasicPublish(
                             exchange: Routing.Exchange,

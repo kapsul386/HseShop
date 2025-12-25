@@ -7,6 +7,9 @@ using OrdersService.Persistence;
 
 namespace OrdersService.Application.Orders;
 
+/// <summary>
+/// Реализация бизнес-логики работы с заказами.
+/// </summary>
 public sealed class OrdersService : IOrdersService
 {
     private readonly OrdersDbContext _db;
@@ -18,6 +21,9 @@ public sealed class OrdersService : IOrdersService
         _user = user;
     }
 
+    /// <summary>
+    /// Создаёт заказ и сохраняет событие OrderCreated в transactional outbox.
+    /// </summary>
     public async Task<CreateOrderResponse> CreateAsync(CreateOrderRequest request, CancellationToken ct)
     {
         if (request.Amount <= 0)
@@ -54,6 +60,9 @@ public sealed class OrdersService : IOrdersService
         return new CreateOrderResponse(order.Id);
     }
 
+    /// <summary>
+    /// Возвращает список заказов текущего пользователя.
+    /// </summary>
     public async Task<List<OrderView>> ListAsync(CancellationToken ct)
     {
         var userId = _user.UserId;
@@ -70,6 +79,9 @@ public sealed class OrdersService : IOrdersService
             .ToListAsync(ct);
     }
 
+    /// <summary>
+    /// Возвращает заказ пользователя по идентификатору.
+    /// </summary>
     public async Task<OrderView?> GetByIdAsync(Guid id, CancellationToken ct)
     {
         var userId = _user.UserId;
@@ -79,6 +91,11 @@ public sealed class OrdersService : IOrdersService
 
         return o is null
             ? null
-            : new OrderView(o.Id, o.Amount, o.Status.ToString(), o.CreatedAtUtc, o.CancelReason);
+            : new OrderView(
+                o.Id,
+                o.Amount,
+                o.Status.ToString(),
+                o.CreatedAtUtc,
+                o.CancelReason);
     }
 }

@@ -6,6 +6,9 @@ using RabbitMQ.Client;
 
 namespace PaymentsService.Infrastructure.Messaging.Outbox;
 
+/// <summary>
+/// Публикует события из transactional outbox PaymentsService в RabbitMQ.
+/// </summary>
 public sealed class PaymentsOutboxPublisher : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
